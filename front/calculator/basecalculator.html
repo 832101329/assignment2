@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>计算器</title>
+    <!-- <link rel="stylesheet" href="./styles.css"> -->
+    <script src="js/axios.js"></script>
+    <script src="js/vue.js"></script>
+    <style>
+        /* Basic Reset */
+        * {
+            border: none;
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* body {} */
+
+        .center {
+            background-color: #ffffff;
+            border-radius: 50%;
+            height: 600px;
+            margin: auto;
+            width: 600px;
+        }
+
+        h1 {
+            color: #495678;
+            font-size: 30px;
+            margin-top: 20px;
+            padding-top: 50px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        form {
+            background-color: #495678;
+            box-shadow: 4px 4px #3d4a65;
+            margin: 40px auto;
+            padding: 20px 5px 20px 20px;
+            width: 350px;
+        }
+
+        .btn {
+            outline: none;
+            cursor: pointer;
+            font-size: 20px;
+            height: 45px;
+            margin: 5px 0 5px 10px;
+            width: 45px;
+        }
+
+        .btn:first-child {
+            margin: 5px 0 5px 10px;
+        }
+
+        .btn,
+        #display,
+        form {
+            border-radius: 25px;
+        }
+
+        #display {
+            outline: none;
+            background-color: #98d1dc;
+            box-shadow: inset 6px 6px 0px #3facc0;
+            color: #dededc;
+            font-size: 20px;
+            height: 47px;
+            text-align: right;
+            width: 180px;
+            padding-right: 10px;
+            margin-left: 10px;
+        }
+
+        #history {
+            outline: none;
+            background-color: #ffffff;
+            box-shadow: inset 6px 6px 0px #e4e1e1;
+            border-radius: 10px;
+            color: #dededc;
+            font-size: 20px;
+            height: 47px;
+            text-align: right;
+            width: 300px;
+            padding-right: 10px;
+            margin-left: 10px;
+        }
+
+        .number {
+            background-color: #72778b;
+            box-shadow: 0 5px #5f6680;
+            color: #dededc;
+        }
+
+        .number:active {
+            box-shadow: 0 2px #5f6680;
+            -webkit-transform: translateY(2px);
+            -ms-transform: translateY(2px);
+            -moz-tranform: translateY(2px);
+            transform: translateY(2px);
+        }
+
+        .operator {
+            background-color: #dededc;
+            box-shadow: 0 5px #bebebe;
+            color: #72778b;
+        }
+
+        .operator:active {
+            box-shadow: 0 2px #bebebe;
+            -webkit-transform: translateY(2px);
+            -ms-transform: translateY(2px);
+            -moz-tranform: translateY(2px);
+            transform: translateY(2px);
+        }
+
+        .other {
+            background-color: #e3844c;
+            box-shadow: 0 5px #e76a3d;
+            color: #dededc;
+        }
+
+        .other:active {
+            box-shadow: 0 2px #e76a3d;
+            -webkit-transform: translateY(2px);
+            -ms-transform: translateY(2px);
+            -moz-tranform: translateY(2px);
+            transform: translateY(2px);
+        }
+
+        .el-textarea__inner::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .el-textarea__inner::-webkit-scrollbar-thumb {
+            border-radius: 3px;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            background-color: #c3c3c3;
+        }
+
+        .el-textarea__inner::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        <h1>Calculator</h1>
+        <form name="calculator">
+            <!-- used for test -->
+            <!-- <div id="app">
+                <input type="text" v-model="message">
+                {{message}}
+            </div> -->
+
+
+            <textarea id="history" class="el-textarea__inner" rows="10" cols="30" readonly
+                style="resize: none;"></textarea>
+            <br>
+            <input type="button" id="back" class="btn other" value="back">
+            <input type="button" id="clear" class="btn other" value="C">
+            <input type="text" id="display">
+            <br>
+            <input type="button" class="btn number" value="%" onclick="get(this.value);">
+            <input type="button" class="btn number" value="7" onclick="get(this.value);">
+            <input type="button" class="btn number" value="8" onclick="get(this.value);">
+            <input type="button" class="btn number" value="9" onclick="get(this.value);">
+            <input type="button" class="btn operator" value="+" onclick="get(this.value);">
+            <br>
+            <input type="button" class="btn number" value="(" onclick="get(this.value);">
+            <input type="button" class="btn number" value="4" onclick="get(this.value);">
+            <input type="button" class="btn number" value="5" onclick="get(this.value);">
+            <input type="button" class="btn number" value="6" onclick="get(this.value);">
+            <input type="button" class="btn operator" value="*" onclick="get(this.value);">
+            <br>
+            <input type="button" class="btn number" value=")" onclick="get(this.value);">
+            <input type="button" class="btn number" value="1" onclick="get(this.value);">
+            <input type="button" class="btn number" value="2" onclick="get(this.value);">
+            <input type="button" class="btn number" value="3" onclick="get(this.value);">
+            <input type="button" class="btn operator" value="-" onclick="get(this.value);">
+            <br>
+            <!-- <input type="button" class="btn number" value="test" onclick="testFun();"> -->
+            <input type="button" class="btn number" value="ans" onclick="getLast()">
+            <input type="button" class="btn number" value="0" onclick="get(this.value);">
+            <input type="button" class="btn operator" value="." onclick="get(this.value);">
+            <input type="button" class="btn operator" value="/" onclick="get(this.value);">
+            <input type="button" class="btn other" value="=" onclick="calculates();">
+        </form>
+    </div>
+    <!-- <script src="./app.js"></script> -->
+    
+</body>
+<script>
+
+    /* limpa o display */
+    document.getElementById("clear").addEventListener("click", function () {
+        document.getElementById("display").value = "";
+    });
+
+    document.getElementById("back").addEventListener("click", function () {
+        var cur = document.getElementById("display").value;
+        cur = cur.substr(0, cur.length - 1);
+        document.getElementById("display").value = cur;
+    });
+    /* recebe os valores */
+    function get(value) {
+        document.getElementById("display").value += value;
+    }
+
+    /* calcula */
+    function calculates() {
+        try {
+            var exp = "";
+            exp = document.getElementById("display").value;
+            document.getElementById("display").value = "";
+            var ans = "";
+            ans = eval(exp);
+            if (ans == "Infinity") {
+                ans = "error for 0!";
+            }
+            document.getElementById("display").value = ans;
+            axios({
+                method: "post",
+                url: "http://localhost:8080/cal/save",
+                params: {
+                    "expression": exp,
+                    "ans": ans
+                }
+            })
+        } catch (SyntaxError) { 
+            document.getElementById("display").value = "error!";
+        }
+    };
+
+    function getLast() {
+        axios({
+            method: "get",
+            url: "http://localhost:8080/cal/get"
+        }).then(result => {
+            document.getElementById("display").value = result.data;
+        })
+
+        axios({
+            method: "get",
+            url: "http://localhost:8080/cal/history"
+        }).then(result => {
+            const historyData = result.data.slice(0, 10).join("\n");
+            const historyTextArea = document.getElementById("history");
+            historyTextArea.value = historyData;
+        })
+    }
+
+</script>
+</html>
